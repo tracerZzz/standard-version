@@ -1099,6 +1099,17 @@ describe('standard-version', function () {
       execCli('--message="V:%s is the %s."')
       shell.exec('git log --oneline -n1').should.include('V:1.1.0 is the 1.1.0.')
     })
+
+    it('respects protocol defined by \'repository\'', function () {
+      writePackageJson('1.0.0', {
+        repository: 'git+https://github.com/foobar/baz.git'
+      })
+      commit('feat: another commit addresses issue #1')
+      execCli()
+      // CHANGELOG should have the new issue URL format.
+      const content = fs.readFileSync('CHANGELOG.md', 'utf-8')
+      content.should.include('https://github.com/foobar/baz/commit')
+    })
   })
 
   describe('pre-major', () => {
